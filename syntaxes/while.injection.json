@@ -1,0 +1,10 @@
+{
+    "scopeName": "while.injection",
+    "injectionSelector": "L:meta.loop.while.uwscr",
+    "patterns": [
+        {
+            "name": "variable.parameter.while.uwscr",
+            "match": "(?i)\\b(continue|break)\\b"
+        }
+    ]
+}

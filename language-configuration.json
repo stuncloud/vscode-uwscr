@@ -1,0 +1,44 @@
+{
+    "comments": {
+        "blockComment": [
+            "textblock\n",
+            "\nendtextblock"
+        ],
+        "lineComment": "//"
+    },
+    "brackets": [
+        ["(",")"],
+        ["[","]"],
+        ["{","}"]
+    ],
+    "autoClosingPairs": [
+        {"open": "(", "close": ")"},
+        {"open": "[", "close": "]"},
+        {"open": "@{", "close": "}@"},
+        {"open": "@[", "close": "]@"},
+        {"open": "\"", "close": "\"", "notIn": ["string"]},
+        {"open": "'", "close": "'", "notIn": ["string"]},
+    ],
+    "surroundingPairs": [
+        ["(",")"],
+        ["[","]"],
+        ["@{","}@"],
+        ["@[","]@"],
+        ["\"","\""],
+        ["'","'"],
+    ],
+    "indentationRules": {
+        "unIndentedLinePattern": {
+            "pattern": "\\bthen\\s+(.+)\\s+else\\b",
+            "flags": "i",
+        },
+        "increaseIndentPattern": {
+            "pattern": "\\b(then|else|select|case|default|try|except|finally|for|while|repeat|hash|enum|struct|function|procedure|module|class|with)\\b",
+            "flags": "i"
+        },
+        "decreaseIndentPattern": {
+            "pattern": "\\b(else|endif|case|default|selend|except|finally|endtry|next|endfor|wend|until|endhash|endenum|endstruct|fend|endmodule|endclass|endwith)\\b",
+            "flags": "i",
+        },
+    }
+}

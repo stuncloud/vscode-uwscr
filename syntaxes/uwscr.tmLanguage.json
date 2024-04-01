@@ -1,0 +1,1108 @@
+{
+  "name": "UWSCR",
+  "scopeName": "source.uwscr",
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#statements"
+    },
+    {
+      "include": "#loop"
+    },
+    {
+      "include": "#block"
+    },
+    {
+      "include": "#line"
+    },
+    {
+      "include": "#expressions"
+    }
+  ],
+  "repository": {
+    "expressions": {
+      "patterns": [
+        {
+          "include": "#literal"
+        },
+        {
+          "include": "#operator"
+        },
+        {
+          "include": "#anonymous"
+        },
+        {
+          "include": "#lambda"
+        },
+        {
+          "include": "#constant"
+        }
+      ]
+    },
+    "statements": {
+      "patterns": [
+        {
+          "include": "#hashtbl"
+        },
+        {
+          "include": "#declaration"
+        },
+        {
+          "include": "#call"
+        },
+        {
+          "include": "#print"
+        },
+        {
+          "include": "#thread"
+        },
+        {
+          "include": "#await"
+        },
+        {
+          "include": "#controls"
+        },
+        {
+          "include": "#def_dll"
+        }
+      ]
+    },
+    "comment": {
+      "patterns": [
+        {
+          "name": "comment.line.uwscr",
+          "match": "(?-m)(//).*\\n?"
+        }
+      ]
+    },
+    "constant": {
+      "name": "constant.other",
+      "match": "\\b[A-Z][A-Z0-9_]+[A-Z]\\b"
+    },
+    "placeholder": {
+      "match": "(?i)(<#)((CR|DBL|TAB)|([0-9A-Z_]+))(>)",
+      "captures": {
+        "1": {
+          "name": "comment.placeholder"
+        },
+        "3": {
+          "name": "constant.placeholder"
+        },
+        "4": {
+          "name": "variable.parameter.placeholder"
+        },
+        "5": {
+          "name": "comment.placeholder"
+        }
+      }
+    },
+    "number": {
+      "patterns": [
+        {
+          "name": "constant.numeric.uwscr",
+          "match": "\\b\\d+(\\.\\d+)?|\\$[0-9A-Fa-f]+\\b"
+        },
+        {
+          "name": "constant.numeric.nan.uwscr",
+          "match": "(?i)\\bNAN\\b"
+        }
+      ]
+    },
+    "literal": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.uwscr",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "include": "#placeholder"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.uwscr",
+          "begin": "'",
+          "end": "'"
+        },
+        {
+          "include": "#number"
+        },
+        {
+          "name": "constant.language.uwscr",
+          "match": "(?i)\\b(TRUE|FALSE|NULL|EMPTY|NOTHING)\\b"
+        }
+      ]
+    },
+    "declaration": {
+      "match": "(?i)^\\s*(DIM|PUBLIC|CONST)\\s+(.+)",
+      "captures": {
+        "1": {
+          "name": "storage.type.hashtbl.uwscr"
+        },
+        "2": {
+          "patterns": [
+            {
+              "match": "([^,\\s]+)(\\s*=\\s*([^,]+))?",
+              "captures": {
+                "1": {
+                  "name": "variable.language.declaration.uwscr"
+                },
+                "3": {
+                  "patterns": [
+                    {
+                      "include": "#expressions"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "hashtbl": {
+      "match": "(?i)^\\s*(PUBLIC\\s+)?(HASHTBL)\\s+(\\S+)(\\s*=\\s*(\\S+))?",
+      "captures": {
+        "1": {
+          "name": "storage.type.public.uwscr"
+        },
+        "2": {
+          "name": "storage.type.hashtbl.uwscr"
+        },
+        "3": {
+          "name": "variable.language.hashtbl.uwscr"
+        },
+        "5": {
+          "patterns": [
+            {
+              "include": "#expressions"
+            }
+          ]
+        }
+      }
+    },
+    "operator": {
+      "name": "keyword.operator.uwscr",
+      "match": "(?i)\\b(MOD|(AND|OR|XOR)[LB]?|\\+|\\-|\\/|\\*|\\?|:)\\b"
+    },
+    "lambda": {
+      "name": "meta.lambda.uwscr",
+      "match": "(\\|)([^\\|]+)\\s*(=>)\\s*([^\\|]+)(\\|)",
+      "captures": {
+        "1": {
+          "name": "storage.type.lambda.begin.uwscr"
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#parameters"
+            }
+          ]
+        },
+        "3": {
+          "name": "storage.type.lambda.arrow.uwscr"
+        },
+        "4": {
+          "patterns": [
+            {
+              "include": "#lambda_expr"
+            }
+          ]
+        },
+        "5": {
+          "name": "storage.type.lambda.end.uwscr"
+        }
+      }
+    },
+    "lambda_expr": {
+      "name": "meta.lambda.body.uwscr",
+      "match": "([^;]+);?",
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#expressions"
+            }
+          ]
+        }
+      }
+    },
+    "line": {
+      "patterns": [
+        {
+          "name": "meta.line.if.uwscr",
+          "match": "(?i)^\\s*(if)\\s+(.+)\\s+(then)(\\s+(.+)(\\s+(else)))?",
+          "captures": {
+            "1": {
+              "name": "storage.type.line.if.uwscr"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            },
+            "3": {
+              "name": "storage.type.line.if.then.uwscr"
+            },
+            "5": {
+              "patterns": [
+                {
+                  "include": "$self"
+                }
+              ]
+            },
+            "7": {
+              "name": "storage.type.line.if.else.uwscr"
+            }
+          }
+        }
+      ]
+    },
+    "block": {
+      "patterns": [
+        {
+          "name": "meta.block.if.uwscr",
+          "begin": "(?i)^\\s*(ifb?)\\s+(.+)\\s+(then)\\s*($|(//.+$))",
+          "beginCaptures": {
+            "1": {
+              "name": "storage.type.if.begin.uwscr"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            },
+            "3": {
+              "name": "storage.type.if.then.uwscr"
+            },
+            "5": {
+              "patterns": [
+                {
+                  "include": "#comment"
+                }
+              ]
+            }
+          },
+          "end": "(?i)^\\s*(endif)",
+          "endCaptures": {
+            "1": {
+              "name": "storage.type.if.end.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "match": "(?i)^\\s*\\b(else|elseif)\\b",
+              "name": "storage.type.if.else.uwscr"
+            },
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "name": "meta.block.select.uwscr",
+          "begin": "(?i)^\\s*(SELECT)",
+          "end": "(?i)^\\s*(SELEND)",
+          "captures": {
+            "1": {
+              "name": "storage.type.select.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "name": "variable.parameter.block.select.uwscr",
+              "match": "(?!)\\s*\\b(CASE|DEFAULT)\\b"
+            },
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "name": "meta.block.with.uwscr",
+          "begin": "(?i)^\\s*(WITH)",
+          "end": "(?i)^\\s*(ENDWITH)",
+          "captures": {
+            "1": {
+              "name": "storage.type.with.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "include": "#hash"
+        },
+        {
+          "name": "meta.block.enum.uwscr",
+          "begin": "(?i)^\\s*(ENUM)\\s+(\\S+)",
+          "end": "(?i)^\\s*(ENDENUM)",
+          "captures": {
+            "1": {
+              "name": "storage.type.enum.uwscr"
+            },
+            "2": {
+              "name": "entity.name.function.enum.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "match": "^\\s*(\\S+)(\\s*=\\s*(\\S+))?",
+              "captures": {
+                "1": {
+                  "name": "variable.parameter.enum.key.uwscr"
+                },
+                "3": {
+                  "patterns": [
+                    {
+                      "include": "#number"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "include": "#comment"
+            }
+          ]
+        },
+        {
+          "name": "meta.block.struct.uwscr",
+          "begin": "(?i)^\\s*(STRUCT)\\s+(\\S+)",
+          "end": "(?i)^\\s*(ENDSTRUCT)",
+          "captures": {
+            "1": {
+              "name": "storage.type.struct.uwscr"
+            },
+            "2": {
+              "name": "entity.name.function.struct.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "match": "(?i)^\\s*(\\S+)\\s*:\\s*(VAR|REF)?\\s*([^\\[]+)(\\[(\\S+)\\])?",
+              "captures": {
+                "1": {
+                  "name": "variable.parameter.struct.member.uwscr"
+                },
+                "2": {
+                  "name": "keyword.control.struct.ref.uwscr"
+                },
+                "3": {
+                  "patterns": [
+                    {
+                      "include": "#struct_types"
+                    }
+                  ]
+                },
+                "5": {
+                  "patterns": [
+                    {
+                      "include": "#number"
+                    },
+                    {
+                      "include": "#constant"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "include": "#comment"
+            }
+          ]
+        },
+        {
+          "include": "#function"
+        },
+        {
+          "include": "#procedure"
+        },
+        {
+          "include": "#anonymous"
+        },
+        {
+          "include": "#textblock"
+        },
+        {
+          "name": "meta.block.try.uwscr",
+          "begin": "(?i)^\\s*(TRY)",
+          "end": "(?i)^\\s*(ENDTRY)",
+          "captures": {
+            "1": {
+              "name": "storage.type.try.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "name": "storage.type.try.uwscr",
+              "match": "(?i)^\\s*\\b(EXCEPT|FINALLY)\\b"
+            },
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "name": "meta.block.module.uwscr",
+          "begin": "(?i)^\\s*(MODULE)\\s+(\\S+)",
+          "end": "(?i)^\\s*(ENDMODULE)",
+          "captures": {
+            "1": {
+              "name": "storage.type.module.uwscr"
+            },
+            "2": {
+              "name": "entity.name.function.module.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#declaration"
+            },
+            {
+              "include": "#hashtbl"
+            },
+            {
+              "include": "#function"
+            },
+            {
+              "include": "#procedure"
+            },
+            {
+              "include": "#textblock"
+            },
+            {
+              "include": "#hash"
+            },
+            {
+              "include": "#def_dll"
+            }
+          ]
+        },
+        {
+          "name": "meta.block.class.uwscr",
+          "begin": "(?i)^\\s*(CLASS)\\s+(\\S+)",
+          "end": "(?i)^\\s*(ENDCLASS)",
+          "captures": {
+            "1": {
+              "name": "storage.type.class.uwscr"
+            },
+            "2": {
+              "name": "entity.name.function.class.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#declaration"
+            },
+            {
+              "include": "#hashtbl"
+            },
+            {
+              "include": "#function"
+            },
+            {
+              "include": "#procedure"
+            },
+            {
+              "include": "#textblock"
+            },
+            {
+              "include": "#hash"
+            },
+            {
+              "include": "#def_dll"
+            }
+          ]
+        }
+      ]
+    },
+    "function": {
+      "name": "meta.block.function.uwscr",
+      "begin": "(?i)^\\s*(ASYNC\\s+)?(FUNCTION)\\s+([^\\(]+)(\\((.*)\\))?",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.function.async.uwscr"
+        },
+        "2": {
+          "name": "storage.type.function.uwscr"
+        },
+        "3": {
+          "name": "entity.name.function.function.uwscr"
+        },
+        "5": {
+          "patterns": [
+            {
+              "include": "#parameters"
+            }
+          ]
+        }
+      },
+      "end": "(?i)^\\s*(FEND)",
+      "endCaptures": {
+        "1": {
+          "name": "storage.type.function.uwscr"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "procedure": {
+      "name": "meta.block.procedure.uwscr",
+      "begin": "(?i)^\\s*(ASYNC\\s+)?(PROCEDURE)\\s+([^\\(]+)(\\((.*)\\))?",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.procedure.async.uwscr"
+        },
+        "2": {
+          "name": "storage.type.procedure.uwscr"
+        },
+        "3": {
+          "name": "entity.name.function.procedure.uwscr"
+        },
+        "5": {
+          "patterns": [
+            {
+              "include": "#parameters"
+            }
+          ]
+        }
+      },
+      "end": "(?i)^\\s*(FEND)",
+      "endCaptures": {
+        "1": {
+          "name": "storage.type.procedure.uwscr"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "anonymous": {
+      "name": "meta.block.anonymous.uwscr",
+      "begin": "(?i)(ASYNC\\s+)?(FUNCTION|PROCEDURE)(\\((.*)\\))?",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.anonymous.async.uwscr"
+        },
+        "2": {
+          "name": "storage.type.anonymous.uwscr"
+        },
+        "4": {
+          "patterns": [
+            {
+              "include": "#parameters"
+            }
+          ]
+        }
+      },
+      "end": "(?i)^\\s*(FEND)",
+      "endCaptures": {
+        "1": {
+          "name": "storage.type.procedure.uwscr"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "parameters": {
+      "name": "meta.parameters.uwscr",
+      "match": "([^,]+)|(\\s*,\\s*([^,]+))",
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#param_ref"
+            },
+            {
+              "include": "#param_args"
+            },
+            {
+              "include": "#param_default"
+            },
+            {
+              "include": "#parameter"
+            }
+          ]
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#param_ref"
+            },
+            {
+              "include": "#param_args"
+            },
+            {
+              "include": "#param_default"
+            },
+            {
+              "include": "#parameter"
+            }
+          ]
+        }
+      }
+    },
+    "parameter": {
+      "name": "meta.parameters.parameter.uwscr",
+      "match": "(?i)([^,=\\s\\[]+)(\\[])?",
+      "captures": {
+        "1": {
+          "name": "variable.parameter.uwscr"
+        }
+      }
+    },
+    "param_ref": {
+      "name": "meta.parameters.ref.uwscr",
+      "match": "(?i)(REF|VAR)\\s+(\\S+)",
+      "captures": {
+        "1": {
+          "name": "keyword.control.ref.uwscr"
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#parameter"
+            }
+          ]
+        }
+      }
+    },
+    "param_args": {
+      "name": "meta.parameters.args.uwscr",
+      "match": "(?i)(PRMS|ARGS)\\s+(\\S+)",
+      "captures": {
+        "1": {
+          "name": "keyword.control.args.uwscr"
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#parameter"
+            }
+          ]
+        }
+      }
+    },
+    "param_default": {
+      "name": "meta.parameters.default.uwscr",
+      "match": "(?i)([^=]+)\\s*=\\s*([^=,]+)",
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#parameter"
+            }
+          ]
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#expressions"
+            }
+          ]
+        }
+      }
+    },
+    "struct_type": {
+      "match": "(?i)\\b((int|long|bool|uint|hwnd|string|Wstring|float|double|word|dword|byte|char|pchar|Wchar|pWchar|boolean|longlong|pointer|size|handle|void)|(\\S+))\\b",
+      "captures": {
+        "1": {
+          "name": "entity.name.type.struct.uwscr"
+        },
+        "2": {
+          "name": "entity.name.function.struct.uwscr"
+        }
+      }
+    },
+    "textblock": {
+      "patterns": [
+        {
+          "name": "meta.block.textblockex.uwscr",
+          "begin": "(?i)^\\s*(TEXTBLOCKEX)\\s+(\\S+)",
+          "end": "(?i)^\\s*(ENDTEXTBLOCK)",
+          "captures": {
+            "1": {
+              "name": "storage.type.textblockex.uwscr"
+            },
+            "2": {
+              "name": "entity.name.function.textblockex.uwscr"
+            },
+            "3": {
+              "patterns": [
+                {
+                  "include": "#comment"
+                }
+              ]
+            }
+          },
+          "contentName": "string.other.textblockex.uwscr",
+          "patterns": [
+            {
+              "include": "#placeholder"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
+        },
+        {
+          "name": "meta.block.textblock.uwscr",
+          "begin": "(?i)^\\s*(TEXTBLOCK)\\s+(\\S+)",
+          "end": "(?i)^\\s*(ENDTEXTBLOCK)",
+          "captures": {
+            "1": {
+              "name": "storage.type.textblock.uwscr"
+            },
+            "2": {
+              "name": "entity.name.function.textblock.uwscr"
+            },
+            "3": {
+              "patterns": [
+                {
+                  "include": "#comment"
+                }
+              ]
+            }
+          },
+          "contentName": "string.other.textblock.uwscr",
+          "patterns": [
+            {
+              "include": "#comment"
+            }
+          ]
+        },
+        {
+          "name": "meta.block.textblock.uwscr",
+          "begin": "(?i)^\\s*(TEXTBLOCK)",
+          "end": "(?i)^\\s*(ENDTEXTBLOCK)",
+          "captures": {
+            "1": {
+              "name": "storage.type.textblock.comment.uwscr"
+            }
+          },
+          "contentName": "comment.block.textblock.uwscr",
+          "patterns": [
+            {
+              "include": "#comment"
+            }
+          ]
+        }
+      ]
+    },
+    "hash": {
+      "name": "meta.block.hash.uwscr",
+      "begin": "(?i)^\\s*(HASH)\\s+(public\\s+)?(\\S+)",
+      "end": "(?i)^\\s*(ENDHASH)",
+      "captures": {
+        "1": {
+          "name": "storage.type.hash.uwscr"
+        },
+        "2": {
+          "name": "storage.modifier.public.uwscr"
+        },
+        "3": {
+          "name": "entity.name.function.hash.uwscr"
+        }
+      },
+      "patterns": [
+        {
+          "match": "^\\s*(\\S+|\\\"\\S+\\\")\\s*=\\s*(\\S+)",
+          "captures": {
+            "1": {
+              "name": "variable.parameter.hash.key.uwscr"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "include": "#literal"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "include": "#comment"
+        }
+      ]
+    },
+    "loop": {
+      "name": "meta.loop.uwscr",
+      "patterns": [
+        {
+          "name": "meta.loop.for.uwscr",
+          "begin": "(?i)^\\s*(FOR)\\s+(\\S+)(\\s*=\\s*(.\\S+)\\s+(TO)\\s+(\\S+)(\\s+(STEP)\\s+\\S+)?|\\s+(IN)\\s+\\S+)",
+          "beginCaptures": {
+            "1": {
+              "name": "storage.type.loop.for.uwscr"
+            },
+            "4": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            },
+            "5": {
+              "name": "storage.type.loop.for.to.uwscr"
+            },
+            "6": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            },
+            "8": {
+              "name": "storage.type.loop.for.step.uwscr"
+            },
+            "9": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            },
+            "10": {
+              "name": "storage.type.loop.for.in.uwscr"
+            },
+            "11": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            }
+          },
+          "end": "(?i)^\\s*\\b(NEXT|ENDFOR)\\b",
+          "endCaptures": {
+            "1": {
+              "name": "storage.type.loop.for.next.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "name": "storage.type.loop.for.else.uwscr",
+              "match": "(?i)^\\s*(ELSE)"
+            },
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "name": "meta.loop.while.uwscr",
+          "begin": "(?i)^\\s*\\b(WHILE)",
+          "end": "(?i)^\\s*\\b(WEND)",
+          "captures": {
+            "1": {
+              "name": "storage.type.loop.while.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "name": "meta.loop.repeat.uwscr",
+          "begin": "(?i)^\\s*\\b(REPEAT)",
+          "end": "(?i)^\\s*\\b(UNTIL)",
+          "captures": {
+            "1": {
+              "name": "storage.type.loop.repeat.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        }
+      ]
+    },
+    "call": {
+      "match": "(?i)^\\s*(CALL)\\s+((url\\[\\s*([^\\[\\]]+)\\s*\\])|(\"[^\"]*\")|([^\\(]+))",
+      "captures": {
+        "1": {
+          "name": "storage.type.call.uwscr"
+        },
+        "3": {
+          "name": "constant.language.url.uwscr"
+        },
+        "4": {
+          "name": "variable.parameter.url.uwscr"
+        },
+        "5": {
+          "name": "string.quoted.double.path.uwscr"
+        },
+        "6": {
+          "name": "variable.parameter.path.uwscr"
+        }
+      }
+    },
+    "print": {
+      "match": "(?i)^\\s*(PRINT)\\s+(\\S+)",
+      "captures": {
+        "1": {
+          "name": "keyword.control.print.uwscr"
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#expressions"
+            }
+          ]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comment"
+        }
+      ]
+    },
+    "thread": {
+      "match": "(?i)^\\s*(THREAD)\\s+([^\\(]+\\()",
+      "captures": {
+        "1": {
+          "name": "keyword.control.modifier.uwscr"
+        }
+      }
+    },
+    "await": {
+      "match": "(?i)(AWAIT)\\s+([^\\(]+\\()",
+      "captures": {
+        "1": {
+          "name": "keyword.control.modifier.uwscr"
+        }
+      }
+    },
+    "controls": {
+      "match": "(?i)^\\s*(COM_ERR_IGN|COM_ERR_RET|EXITEXIT|EXIT(\\s+(\\S+))?)",
+      "captures": {
+        "1": {
+          "name": "keyword.control.controls.uwscr"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#expressions"
+            }
+          ]
+        }
+      }
+    },
+    "def_dll": {
+      "match": "(?i)^\\s*(DEF_DLL)\\s+([^:\\(]+\\s*:\\s*)?([^\\(]+)\\(([^:]*)\\)\\s*:\\s*(([^:]+)\\s*:\\s*)?(\\S+)",
+      "captures": {
+        "1": {
+          "name": "storage.type.def_dll.uwscr"
+        },
+        "2": {
+          "name": "entity.name.function.def_dll.alias.uwscr"
+        },
+        "3": {
+          "name": "entity.name.function.def_dll.name.uwscr"
+        },
+        "4": {
+          "patterns": [
+            {
+              "include": "#dll_params"
+            }
+          ]
+        },
+        "6": {
+          "patterns": [
+            {
+              "include": "#dll_types"
+            },
+            {
+              "include": "#dll_ret_types"
+            }
+          ]
+        },
+        "7": {
+          "name": "variable.parameter.path.uwscr"
+        }
+      }
+    },
+    "dll_types": {
+      "match": "(?i)(int|long|bool|uint|dword|float|double|word|wchar|byte|char|boolean|longlong|hwnd|handle|pointer)",
+      "captures": {
+        "1": {
+          "name": "support.type.dll.uwscr"
+        }
+      }
+    },
+    "dll_param_types": {
+      "match": "(?i)(string|pchar|wstring|pwchar|struct|safearray)|(callback\\(([^:]+)\\))",
+      "captures": {
+        "1": {
+          "name": "support.type.dll.uwscr"
+        },
+        "2": {
+          "name": "entity.name.function.callback.uwscr"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#dll_params"
+            }
+          ]
+        }
+      }
+    },
+    "dll_ret_types": {
+      "match": "(?i)\\b(void)\\b",
+      "captures": {
+        "1": {
+          "name": "support.type.dll.uwscr"
+        }
+      }
+    },
+    "dll_params": {
+      "match": "(?i)((ref|bar)\\s+)?(\\b[^,\\[]+)(\\[([^\\[]*)\\])?",
+      "captures": {
+        "2": {
+          "name": "keyword.control.def_dll.ref.uwscr"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#dll_types"
+            },
+            {
+              "include": "#dll_param_types"
+            }
+          ]
+        },
+        "5": {
+          "patterns": [
+            {
+              "include": "#expressions"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

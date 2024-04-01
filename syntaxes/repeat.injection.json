@@ -1,0 +1,10 @@
+{
+    "scopeName": "repeat.injection",
+    "injectionSelector": "L:meta.loop.repeat.uwscr",
+    "patterns": [
+        {
+            "name": "variable.parameter.repeat.uwscr",
+            "match": "(?i)\\b(continue|break)\\b"
+        }
+    ]
+}

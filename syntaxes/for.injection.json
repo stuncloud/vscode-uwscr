@@ -1,0 +1,10 @@
+{
+    "scopeName": "for.injection",
+    "injectionSelector": "L:meta.loop.for.uwscr",
+    "patterns": [
+        {
+            "name": "variable.parameter.for.uwscr",
+            "match": "(?i)\\b(continue|break)\\b"
+        }
+    ]
+}

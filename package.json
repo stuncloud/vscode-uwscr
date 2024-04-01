@@ -1,0 +1,102 @@
+{
+  "name": "vscode-uwscr",
+  "displayName": "UWSCR",
+  "description": "UWSCR開発サポート用拡張機能",
+  "version": "0.0.1",
+  "publisher": "stuncloud",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:UWSCR"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-uwscr.helloWorld",
+        "title": "Hello World"
+      }
+    ],
+    "configuration": {
+      "title": "vscode-uwscr",
+      "properties": {
+        "vscode-uwscr.serverPath": {
+          "type": "string",
+          "default": "uwscr.exe",
+          "description": "%description.serverPath%"
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "UWSCR",
+        "extensions": [
+          ".uws",
+          ".uwsr"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "UWSCR",
+        "scopeName": "source.uwscr",
+        "path": "./syntaxes/uwscr.tmLanguage.json"
+      },
+      {
+        "path": "./syntaxes/function.injection.json",
+        "scopeName": "function.injection",
+        "injectTo": ["source.uwscr"]
+      },
+      {
+        "path": "./syntaxes/for.injection.json",
+        "scopeName": "for.injection",
+        "injectTo": ["source.uwscr"]
+      },
+      {
+        "path": "./syntaxes/while.injection.json",
+        "scopeName": "while.injection",
+        "injectTo": ["source.uwscr"]
+      },
+      {
+        "path": "./syntaxes/repeat.injection.json",
+        "scopeName": "repeat.injection",
+        "injectTo": ["source.uwscr"]
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "constant": ["constant.other.builtin.uwscr"]
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.84.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.54.0",
+    "js-yaml": "^4.1.0",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}
