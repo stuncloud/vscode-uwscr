@@ -1,7 +1,7 @@
 {
   "name": "vscode-uwscr",
   "displayName": "UWSCR",
-  "description": "UWSCR開発サポート用拡張機能",
+  "description": "UWSCRコーディング支援",
   "version": "0.1.0",
   "publisher": "stuncloud",
   "repository": {
