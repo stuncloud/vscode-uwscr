@@ -53,6 +53,11 @@
         "injectTo": ["source.uwscr"]
       },
       {
+        "path": "./syntaxes/anonymous.function.injection.json",
+        "scopeName": "anonymous.function.injection",
+        "injectTo": ["source.uwscr"]
+      },
+      {
         "path": "./syntaxes/for.injection.json",
         "scopeName": "for.injection",
         "injectTo": ["source.uwscr"]

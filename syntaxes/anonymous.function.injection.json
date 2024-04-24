@@ -1,0 +1,10 @@
+{
+    "scopeName": "anonymous.function.injection",
+    "injectionSelector": "L:meta.block.anonymous.function.uwscr",
+    "patterns": [
+        {
+            "name": "variable.parameter.result.uwscr",
+            "match": "(?i)\\bresult\\b"
+        }
+    ]
+}

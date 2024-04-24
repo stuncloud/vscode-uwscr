@@ -7,23 +7,14 @@
     },
     {
       "include": "#statements"
-    },
-    {
-      "include": "#loop"
-    },
-    {
-      "include": "#block"
-    },
-    {
-      "include": "#line"
-    },
-    {
-      "include": "#expressions"
     }
   ],
   "repository": {
     "expressions": {
       "patterns": [
+        {
+          "include": "#comment"
+        },
         {
           "include": "#literal"
         },
@@ -43,6 +34,9 @@
     },
     "statements": {
       "patterns": [
+        {
+          "include": "#comment"
+        },
         {
           "include": "#hashtbl"
         },
@@ -66,6 +60,18 @@
         },
         {
           "include": "#def_dll"
+        },
+        {
+          "include": "#loop"
+        },
+        {
+          "include": "#block"
+        },
+        {
+          "include": "#line"
+        },
+        {
+          "include": "#expressions"
         }
       ]
     },
@@ -73,12 +79,12 @@
       "patterns": [
         {
           "name": "comment.line.uwscr",
-          "match": "(?-m)(//).*\\n?"
+          "match": "//.*$"
         }
       ]
     },
     "constant": {
-      "name": "constant.other",
+      "name": "constant.other.user.uwscr",
       "match": "\\b[A-Z][A-Z0-9_]+[A-Z]\\b"
     },
     "placeholder": {
@@ -137,10 +143,10 @@
       ]
     },
     "declaration": {
-      "match": "(?i)^\\s*(DIM|PUBLIC|CONST)\\s+(.+)",
+      "match": "(?i)(DIM|PUBLIC|CONST)\\s+([^;]+)",
       "captures": {
         "1": {
-          "name": "storage.type.hashtbl.uwscr"
+          "name": "storage.type.declaration.uwscr"
         },
         "2": {
           "patterns": [
@@ -164,10 +170,10 @@
       }
     },
     "hashtbl": {
-      "match": "(?i)^\\s*(PUBLIC\\s+)?(HASHTBL)\\s+(\\S+)(\\s*=\\s*(\\S+))?",
+      "match": "(?i)(PUBLIC\\s+)?(HASHTBL)\\s+(\\S+)(\\s*=\\s*(\\S+))?",
       "captures": {
         "1": {
-          "name": "storage.type.public.uwscr"
+          "name": "storage.type.hashtbl.public.uwscr"
         },
         "2": {
           "name": "storage.type.hashtbl.uwscr"
@@ -234,7 +240,7 @@
       "patterns": [
         {
           "name": "meta.line.if.uwscr",
-          "match": "(?i)^\\s*(if)\\s+(.+)\\s+(then)(\\s+(.+)(\\s+(else)))?",
+          "match": "(?i)(if)\\s+([^;]+)\\s+(then)(\\s+([^;]+)(\\s+(else)))?",
           "captures": {
             "1": {
               "name": "storage.type.line.if.uwscr"
@@ -242,7 +248,7 @@
             "2": {
               "patterns": [
                 {
-                  "include": "#expressions"
+                  "include": "#expression"
                 }
               ]
             },
@@ -252,7 +258,7 @@
             "5": {
               "patterns": [
                 {
-                  "include": "$self"
+                  "include": "#statements"
                 }
               ]
             },
@@ -267,7 +273,7 @@
       "patterns": [
         {
           "name": "meta.block.if.uwscr",
-          "begin": "(?i)^\\s*(ifb?)\\s+(.+)\\s+(then)\\s*($|(//.+$))",
+          "begin": "(?i)(ifb?)\\s+(.+)\\s+(then)\\s*($|(//.+$|;))",
           "beginCaptures": {
             "1": {
               "name": "storage.type.if.begin.uwscr"
@@ -290,16 +296,20 @@
               ]
             }
           },
-          "end": "(?i)^\\s*(endif)",
+          "end": "(?i)(^|;)\\s*(endif)",
           "endCaptures": {
-            "1": {
+            "2": {
               "name": "storage.type.if.end.uwscr"
             }
           },
           "patterns": [
             {
-              "match": "(?i)^\\s*\\b(else|elseif)\\b",
-              "name": "storage.type.if.else.uwscr"
+              "match": "(?i)(^|;)\\s*\\b(else|elseif)\\b",
+              "captures": {
+                "2": {
+                  "name": "storage.type.if.else.uwscr"
+                }
+              }
             },
             {
               "include": "$self"
@@ -308,17 +318,26 @@
         },
         {
           "name": "meta.block.select.uwscr",
-          "begin": "(?i)^\\s*(SELECT)",
-          "end": "(?i)^\\s*(SELEND)",
-          "captures": {
+          "begin": "(?i)(SELECT)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.select.uwscr"
             }
           },
+          "end": "(?i)(^|;)\\s*(SELEND)",
+          "endCaptures": {
+            "2": {
+              "name": "storage.type.selend.uwscr"
+            }
+          },
           "patterns": [
             {
-              "name": "variable.parameter.block.select.uwscr",
-              "match": "(?!)\\s*\\b(CASE|DEFAULT)\\b"
+              "match": "(?i)(^|;)\\s*(CASE|DEFAULT)",
+              "captures": {
+                "2": {
+                  "name": "variable.parameter.block.case.uwscr"
+                }
+              }
             },
             {
               "include": "$self"
@@ -327,11 +346,16 @@
         },
         {
           "name": "meta.block.with.uwscr",
-          "begin": "(?i)^\\s*(WITH)",
-          "end": "(?i)^\\s*(ENDWITH)",
-          "captures": {
+          "begin": "(?i)(WITH)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.with.uwscr"
+            }
+          },
+          "end": "(?i)(^|;)\\s*(ENDWITH)",
+          "captures": {
+            "2": {
+              "name": "storage.type.endwith.uwscr"
             }
           },
           "patterns": [
@@ -345,9 +369,8 @@
         },
         {
           "name": "meta.block.enum.uwscr",
-          "begin": "(?i)^\\s*(ENUM)\\s+(\\S+)",
-          "end": "(?i)^\\s*(ENDENUM)",
-          "captures": {
+          "begin": "(?i)(ENUM)\\s+([^;\\s]+)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.enum.uwscr"
             },
@@ -355,14 +378,20 @@
               "name": "entity.name.function.enum.uwscr"
             }
           },
+          "end": "(?i)(^|;)\\s*(ENDENUM)",
+          "endCaptures": {
+            "2": {
+              "name": "storage.type.endenum.uwscr"
+            }
+          },
           "patterns": [
             {
-              "match": "^\\s*(\\S+)(\\s*=\\s*(\\S+))?",
+              "match": "(^|;)\\s*([^;\\s=]+)(\\s*=\\s*(\\d+|\\$[0-9A-Fa-f]+))?",
               "captures": {
-                "1": {
+                "2": {
                   "name": "variable.parameter.enum.key.uwscr"
                 },
-                "3": {
+                "4": {
                   "patterns": [
                     {
                       "include": "#number"
@@ -378,9 +407,8 @@
         },
         {
           "name": "meta.block.struct.uwscr",
-          "begin": "(?i)^\\s*(STRUCT)\\s+(\\S+)",
-          "end": "(?i)^\\s*(ENDSTRUCT)",
-          "captures": {
+          "begin": "(?i)(STRUCT)\\s+([^;\\s]+)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.struct.uwscr"
             },
@@ -388,24 +416,30 @@
               "name": "entity.name.function.struct.uwscr"
             }
           },
+          "end": "(?i)(^|;)\\s*(ENDSTRUCT)",
+          "endCaptures": {
+            "2": {
+              "name": "storage.type.endstruct.uwscr"
+            }
+          },
           "patterns": [
             {
-              "match": "(?i)^\\s*(\\S+)\\s*:\\s*(VAR|REF)?\\s*([^\\[]+)(\\[(\\S+)\\])?",
+              "match": "(?i)(^|;)\\s*([^;\\s:]+)\\s*:\\s*((VAR|REF)\\s+)?\\s*([^\\[\\s;]+)(\\[([^;\\s]+)\\])?",
               "captures": {
-                "1": {
+                "2": {
                   "name": "variable.parameter.struct.member.uwscr"
                 },
-                "2": {
+                "4": {
                   "name": "keyword.control.struct.ref.uwscr"
                 },
-                "3": {
+                "5": {
                   "patterns": [
                     {
                       "include": "#struct_types"
                     }
                   ]
                 },
-                "5": {
+                "7": {
                   "patterns": [
                     {
                       "include": "#number"
@@ -429,24 +463,44 @@
           "include": "#procedure"
         },
         {
-          "include": "#anonymous"
+          "include": "#anon_func"
+        },
+        {
+          "include": "#anon_proc"
         },
         {
           "include": "#textblock"
         },
         {
           "name": "meta.block.try.uwscr",
-          "begin": "(?i)^\\s*(TRY)",
-          "end": "(?i)^\\s*(ENDTRY)",
-          "captures": {
+          "begin": "(?i)(TRY)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.try.uwscr"
             }
           },
+          "end": "(?i)(^|;)\\s*(ENDTRY)",
+          "endCaptures": {
+            "2": {
+              "name": "storage.type.endtry.uwscr"
+            }
+          },
           "patterns": [
             {
-              "name": "storage.type.try.uwscr",
-              "match": "(?i)^\\s*\\b(EXCEPT|FINALLY)\\b"
+              "match": "(?i)(^|;)\\s*(EXCEPT)",
+              "captures": {
+                "2": {
+                  "name": "storage.type.except.uwscr"
+                }
+              }
+            },
+            {
+              "match": "(?i)(^|;)\\s*(FINALLY)",
+              "captures": {
+                "2": {
+                  "name": "storage.type.finally.uwscr"
+                }
+              }
             },
             {
               "include": "$self"
@@ -455,9 +509,8 @@
         },
         {
           "name": "meta.block.module.uwscr",
-          "begin": "(?i)^\\s*(MODULE)\\s+(\\S+)",
-          "end": "(?i)^\\s*(ENDMODULE)",
-          "captures": {
+          "begin": "(?i)(MODULE)\\s+([^;\\s]+)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.module.uwscr"
             },
@@ -465,7 +518,16 @@
               "name": "entity.name.function.module.uwscr"
             }
           },
+          "end": "(?i)(^|;)\\s*(ENDMODULE)",
+          "captures": {
+            "2": {
+              "name": "storage.type.endmodule.uwscr"
+            }
+          },
           "patterns": [
+            {
+              "include": "#comment"
+            },
             {
               "include": "#declaration"
             },
@@ -491,9 +553,8 @@
         },
         {
           "name": "meta.block.class.uwscr",
-          "begin": "(?i)^\\s*(CLASS)\\s+(\\S+)",
-          "end": "(?i)^\\s*(ENDCLASS)",
-          "captures": {
+          "begin": "(?i)(CLASS)\\s+([^;\\s]+)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.class.uwscr"
             },
@@ -501,7 +562,16 @@
               "name": "entity.name.function.class.uwscr"
             }
           },
+          "end": "(?i)(^|;)\\s*(ENDCLASS)",
+          "captures": {
+            "2": {
+              "name": "storage.type.endclass.uwscr"
+            }
+          },
           "patterns": [
+            {
+              "include": "#comment"
+            },
             {
               "include": "#declaration"
             },
@@ -529,7 +599,7 @@
     },
     "function": {
       "name": "meta.block.function.uwscr",
-      "begin": "(?i)^\\s*(ASYNC\\s+)?(FUNCTION)\\s+([^\\(]+)(\\((.*)\\))?",
+      "begin": "(?i)(ASYNC\\s+)?(FUNCTION)\\s+([^\\(\\s;]+)(\\(([^;]*)\\))?",
       "beginCaptures": {
         "1": {
           "name": "keyword.control.function.async.uwscr"
@@ -548,9 +618,9 @@
           ]
         }
       },
-      "end": "(?i)^\\s*(FEND)",
+      "end": "(?i)(^|;)\\s*(FEND)",
       "endCaptures": {
-        "1": {
+        "2": {
           "name": "storage.type.function.uwscr"
         }
       },
@@ -562,7 +632,7 @@
     },
     "procedure": {
       "name": "meta.block.procedure.uwscr",
-      "begin": "(?i)^\\s*(ASYNC\\s+)?(PROCEDURE)\\s+([^\\(]+)(\\((.*)\\))?",
+      "begin": "(?i)(ASYNC\\s+)?(PROCEDURE)\\s+([^\\(\\s;]+)(\\(([^;]*)\\))?",
       "beginCaptures": {
         "1": {
           "name": "keyword.control.procedure.async.uwscr"
@@ -581,9 +651,9 @@
           ]
         }
       },
-      "end": "(?i)^\\s*(FEND)",
+      "end": "(?i)(^|;)\\s*(FEND)",
       "endCaptures": {
-        "1": {
+        "2": {
           "name": "storage.type.procedure.uwscr"
         }
       },
@@ -593,15 +663,15 @@
         }
       ]
     },
-    "anonymous": {
-      "name": "meta.block.anonymous.uwscr",
-      "begin": "(?i)(ASYNC\\s+)?(FUNCTION|PROCEDURE)(\\((.*)\\))?",
+    "anon_func": {
+      "name": "meta.block.anonymous.function.uwscr",
+      "begin": "(?i)(ASYNC\\s+)?(FUNCTION)(\\(([^;]*)\\))?",
       "beginCaptures": {
         "1": {
           "name": "keyword.control.anonymous.async.uwscr"
         },
         "2": {
-          "name": "storage.type.anonymous.uwscr"
+          "name": "storage.type.anonymous.function.uwscr"
         },
         "4": {
           "patterns": [
@@ -611,10 +681,40 @@
           ]
         }
       },
-      "end": "(?i)^\\s*(FEND)",
+      "end": "(?i)(^|;)\\s*(FEND)",
       "endCaptures": {
+        "2": {
+          "name": "storage.type.anonymous.fend.uwscr"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "anon_proc": {
+      "name": "meta.block.anonymous.procedure.uwscr",
+      "begin": "(?i)(ASYNC\\s+)?(PROCEDURE)(\\(([^;]*)\\))?",
+      "beginCaptures": {
         "1": {
-          "name": "storage.type.procedure.uwscr"
+          "name": "keyword.control.anonymous.async.uwscr"
+        },
+        "2": {
+          "name": "storage.type.anonymous.procedure.uwscr"
+        },
+        "4": {
+          "patterns": [
+            {
+              "include": "#parameters"
+            }
+          ]
+        }
+      },
+      "end": "(?i)(^|;)\\s*(FEND)",
+      "endCaptures": {
+        "2": {
+          "name": "storage.type.anonymous.fend.uwscr"
         }
       },
       "patterns": [
@@ -722,8 +822,8 @@
         }
       }
     },
-    "struct_type": {
-      "match": "(?i)\\b((int|long|bool|uint|hwnd|string|Wstring|float|double|word|dword|byte|char|pchar|Wchar|pWchar|boolean|longlong|pointer|size|handle|void)|(\\S+))\\b",
+    "struct_types": {
+      "match": "(?i)(int|long|bool|uint|hwnd|string|Wstring|float|double|word|dword|byte|char|pchar|Wchar|pWchar|boolean|longlong|pointer|size|handle|void)|([^;\\s]+)",
       "captures": {
         "1": {
           "name": "entity.name.type.struct.uwscr"
@@ -810,9 +910,8 @@
     },
     "hash": {
       "name": "meta.block.hash.uwscr",
-      "begin": "(?i)^\\s*(HASH)\\s+(public\\s+)?(\\S+)",
-      "end": "(?i)^\\s*(ENDHASH)",
-      "captures": {
+      "begin": "(?i)(HASH)\\s+(public\\s+)?([^;=\\s]+)(\\s*=\\s*([^;]+))?",
+      "beginCaptures": {
         "1": {
           "name": "storage.type.hash.uwscr"
         },
@@ -821,19 +920,32 @@
         },
         "3": {
           "name": "entity.name.function.hash.uwscr"
+        },
+        "5": {
+          "patterns": [
+            {
+              "include": "#expressions"
+            }
+          ]
+        }
+      },
+      "end": "(?i)(^|;)\\s*(ENDHASH)",
+      "endCaptures": {
+        "2": {
+          "name": "storage.type.endhash.uwscr"
         }
       },
       "patterns": [
         {
-          "match": "^\\s*(\\S+|\\\"\\S+\\\")\\s*=\\s*(\\S+)",
+          "match": "(^|;)\\s*([^;]+|\\\"[^\";\"]+\\\")\\s*=\\s*([^;]+)",
           "captures": {
-            "1": {
+            "2": {
               "name": "variable.parameter.hash.key.uwscr"
             },
-            "2": {
+            "3": {
               "patterns": [
                 {
-                  "include": "#literal"
+                  "include": "#expressions"
                 }
               ]
             }
@@ -849,7 +961,7 @@
       "patterns": [
         {
           "name": "meta.loop.for.uwscr",
-          "begin": "(?i)^\\s*(FOR)\\s+(\\S+)(\\s*=\\s*(.\\S+)\\s+(TO)\\s+(\\S+)(\\s+(STEP)\\s+\\S+)?|\\s+(IN)\\s+\\S+)",
+          "begin": "(?i)(FOR)\\s+(\\S+)(\\s*=\\s*([^;]+)\\s+(TO)\\s+([^;]+)(\\s+(STEP)\\s+([^;]+))?|\\s+(IN)\\s+([^;]+))",
           "beginCaptures": {
             "1": {
               "name": "storage.type.loop.for.uwscr"
@@ -892,16 +1004,77 @@
               ]
             }
           },
-          "end": "(?i)^\\s*\\b(NEXT|ENDFOR)\\b",
+          "end": "(?i)(^|;)\\s*(NEXT)",
           "endCaptures": {
-            "1": {
+            "2": {
               "name": "storage.type.loop.for.next.uwscr"
             }
           },
           "patterns": [
             {
-              "name": "storage.type.loop.for.else.uwscr",
-              "match": "(?i)^\\s*(ELSE)"
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "name": "meta.loop.forelse.uwscr",
+          "begin": "(?i)(FOR)\\s+(\\S+)(\\s*=\\s*([^;]+)\\s+(TO)\\s+([^;]+)(\\s+(STEP)\\s+([^;]+))?|\\s+(IN)\\s+([^;]+))",
+          "beginCaptures": {
+            "1": {
+              "name": "storage.type.loop.for.uwscr"
+            },
+            "4": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            },
+            "5": {
+              "name": "storage.type.loop.for.to.uwscr"
+            },
+            "6": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            },
+            "8": {
+              "name": "storage.type.loop.for.step.uwscr"
+            },
+            "9": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            },
+            "10": {
+              "name": "storage.type.loop.for.in.uwscr"
+            },
+            "11": {
+              "patterns": [
+                {
+                  "include": "#expressions"
+                }
+              ]
+            }
+          },
+          "end": "(?i)(^|;)\\s*(ENDFOR)",
+          "endCaptures": {
+            "2": {
+              "name": "storage.type.loop.for.endfor.uwscr"
+            }
+          },
+          "patterns": [
+            {
+              "match": "(?i)(^|;)\\s*(ELSE)",
+              "captures": {
+                "2": {
+                  "name": "storage.type.loop.for.else.uwscr"
+                }
+              }
             },
             {
               "include": "$self"
@@ -910,11 +1083,23 @@
         },
         {
           "name": "meta.loop.while.uwscr",
-          "begin": "(?i)^\\s*\\b(WHILE)",
-          "end": "(?i)^\\s*\\b(WEND)",
-          "captures": {
+          "begin": "(?i)(WHILE)\\s+([^;]+)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.loop.while.uwscr"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "include": "#expression"
+                }
+              ]
+            }
+          },
+          "end": "(?i)(^|;)\\s*(WEND)",
+          "endCaptures": {
+            "2": {
+              "name": "storage.type.loop.wend.uwscr"
             }
           },
           "patterns": [
@@ -925,11 +1110,23 @@
         },
         {
           "name": "meta.loop.repeat.uwscr",
-          "begin": "(?i)^\\s*\\b(REPEAT)",
-          "end": "(?i)^\\s*\\b(UNTIL)",
-          "captures": {
+          "begin": "(?i)(REPEAT)",
+          "beginCaptures": {
             "1": {
               "name": "storage.type.loop.repeat.uwscr"
+            }
+          },
+          "end": "(?i)(^|;)\\s*(UNTIL)\\s+([^;]+)",
+          "endCaptures": {
+            "2": {
+              "name": "storage.type.loop.until.uwscr"
+            },
+            "3": {
+              "patterns": [
+                {
+                  "include": "#expression"
+                }
+              ]
             }
           },
           "patterns": [
@@ -961,7 +1158,7 @@
       }
     },
     "print": {
-      "match": "(?i)^\\s*(PRINT)\\s+(\\S+)",
+      "match": "(?i)(PRINT)\\s+([^;]+)",
       "captures": {
         "1": {
           "name": "keyword.control.print.uwscr"
@@ -997,7 +1194,7 @@
       }
     },
     "controls": {
-      "match": "(?i)^\\s*(COM_ERR_IGN|COM_ERR_RET|EXITEXIT|EXIT(\\s+(\\S+))?)",
+      "match": "(?i)(COM_ERR_IGN|COM_ERR_RET|EXITEXIT|EXIT(\\s+([^;]+))?)",
       "captures": {
         "1": {
           "name": "keyword.control.controls.uwscr"
@@ -1012,7 +1209,7 @@
       }
     },
     "def_dll": {
-      "match": "(?i)^\\s*(DEF_DLL)\\s+([^:\\(]+\\s*:\\s*)?([^\\(]+)\\(([^:]*)\\)\\s*:\\s*(([^:]+)\\s*:\\s*)?(\\S+)",
+      "match": "(?i)(DEF_DLL)\\s+([^:\\(]+\\s*:\\s*)?([^\\(]+)\\(([^:]*)\\)\\s*:\\s*(([^:]+)\\s*:\\s*)?([\\S]+)",
       "captures": {
         "1": {
           "name": "storage.type.def_dll.uwscr"
