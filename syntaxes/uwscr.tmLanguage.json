@@ -78,6 +78,10 @@
     "comment": {
       "patterns": [
         {
+          "name": "comment.dummy.uwscr",
+          "match": "//-"
+        },
+        {
           "name": "comment.line.uwscr",
           "match": "//.*$"
         }

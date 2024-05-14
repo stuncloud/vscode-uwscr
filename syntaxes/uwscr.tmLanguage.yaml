@@ -29,6 +29,8 @@ repository:
       - include: '#expressions'
   comment:
     patterns:
+      - name: comment.dummy.uwscr
+        match: //-
       - name: comment.line.uwscr
         match: //.*$
   constant:
