@@ -1,9 +1,9 @@
-# Change Log
+# 更新履歴
 
-All notable changes to the "vscode-uwscr" extension will be documented in this file.
+## 0.1.1
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+ダミーコメントのハイライトに対応
 
-## [Unreleased]
+## 0.1.0
 
-- Initial release
+リリース
